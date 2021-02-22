@@ -1,0 +1,167 @@
+To get started in the command line run the following to access mysql misc database (if created):
+sudo mysql xenon;
+
+If the database is not created, run the sudo mysql in the terminal and the following SQL commands:
+
+CREATE DATABASE xenon;
+CREATE USER 'li'@'localhost' IDENTIFIED BY '1917';
+GRANT ALL ON xenon.* TO 'li'@'localhost';
+CREATE USER 'li'@'127.0.0.1' IDENTIFIED BY '1917';
+GRANT ALL ON xenon.* TO 'li'@'127.0.0.1';
+USE xenon;
+
+After connected to the misc database,run the following to create the following tables
+
+CREATE TABLE internal_user(
+    user_id INTEGER NOT NULL AUTO_INCREMENT KEY,
+    user_first_name VARCHAR(128),
+    user_last_name VARCHAR(128),
+    user_email VARCHAR(128),
+    username VARCHAR(128),
+    password VARCHAR(128)
+);
+
+CREATE TABLE state(
+    state_id INTEGER NOT NULL AUTO_INCREMENT KEY,
+    state_name CHAR(128),
+    state_name_full CHAR(255),
+    UNIQUE(state_name)
+);
+
+CREATE TABLE source(
+    source_id INTEGER NOT NULL AUTO_INCREMENT KEY,
+    source_name VARCHAR(255),
+    UNIQUE(source_name)
+);
+
+CREATE TABLE Profile(
+    profile_id INTEGER NOT NULL AUTO_INCREMENT,
+    first_name VARCHAR(128),
+    last_name VARCHAR(128),
+    title VARCHAR(128),
+    added_time VARCHAR(128),
+    edited_time VARCHAR(128),
+    user_id INTEGER,
+    transferred_backup BOOLEAN,
+    source_id INTEGER,
+    state_id INTEGER,
+
+    PRIMARY KEY(profile_id),
+    CONSTRAINT profile_ibfk_1
+      FOREIGN KEY (user_id)
+      REFERENCES internal_user (user_id)
+      ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT profile_ibfk_2
+      FOREIGN KEY (source_id)
+      REFERENCES source (source_id)
+      ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT profile_ibfk_3
+      FOREIGN KEY (state_id)
+      REFERENCES state (state_id)
+      ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE Address(
+    add_id INTEGER NOT NULL AUTO_INCREMENT,
+    street VARCHAR(255),
+    city VARCHAR(128),
+    state_id INTEGER,
+    zip_code VARCHAR(128),
+    profile_id INTEGER,
+
+    PRIMARY KEY(add_id),
+    CONSTRAINT address_ibfk_1
+      FOREIGN KEY (profile_id)
+      REFERENCES Profile (profile_id)
+      ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT address_ibfk_2
+      FOREIGN KEY (state_id)
+      REFERENCES state (state_id)
+      ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+
+CREATE TABLE Email(
+    email_id INTEGER NOT NULL AUTO_INCREMENT,
+    email VARCHAR(255),
+    profile_id INTEGER,
+    PRIMARY KEY(email_id),
+    CONSTRAINT email_ibfk_1
+      FOREIGN KEY (profile_id)
+      REFERENCES Profile (profile_id)
+      ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE Phone(
+    phone_id INTEGER NOT NULL AUTO_INCREMENT,
+    phone VARCHAR(255),
+    profile_id INTEGER,
+    PRIMARY KEY(phone_id),
+    CONSTRAINT phone_ibfk_1
+      FOREIGN KEY (profile_id)
+      REFERENCES Profile (profile_id)
+      ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+//insert states to the state table
+LOAD DATA INFILE "states.csv"
+INTO TABLE state
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
+
+//if not working, use the following code
+INSERT INTO state (state_name, state_name_full)
+VALUES
+("AL","Alabama"),
+("AK","Alaska"),
+("AZ","Arizona"),
+("AR","Arkansas"),
+("CA","California"),
+("CO","Colorado"),
+("CT","Connecticut"),
+("DE","Delaware"),
+("FL","Florida"),
+("GA","Georgia"),
+("HI","Hawaii"),
+("ID","Idaho"),
+("IL","Illinois"),
+("IN","Indiana"),
+("IA","Iowa"),
+("KS","Kansas"),
+("KY","Kentucky"),
+("LA","Louisiana"),
+("ME","Maine"),
+("MD","Maryland"),
+("MA","Massachusetts"),
+("MI","Michigan"),
+("MN","Minnesota"),
+("MS","Mississippi"),
+("MO","Missouri"),
+("MT","Montana"),
+("NE","Nebraska"),
+("NV","Nevada"),
+("NH","New Hampshire"),
+("NJ","New Jersey"),
+("NM","New Mexico"),
+("NY","New York"),
+("NC","North Carolina"),
+("ND","North Dakota"),
+("OH","Ohio"),
+("OK","Oklahoma"),
+("OR","Oregon"),
+("PA","Pennsylvania"),
+("RI","Rhode Island"),
+("SC","South Carolina"),
+("SD","South Dakota"),
+("TN","Tennessee"),
+("TX","Texas"),
+("UT","Utah"),
+("VT","Vermont"),
+("VA","Virginia"),
+("WA","Washington"),
+("WV","West Virginia"),
+("WI","Wisconsin"),
+("WY","Wyoming");
